@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: moviesp-backend
+    env: docker
+    repo: https://github.com/devxploit/movie
+    branch: main
+    dockerfilePath: Dockerfile
+    instanceType: starter   # ajustar según necesidad
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod

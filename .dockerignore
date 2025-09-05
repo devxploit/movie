@@ -1,0 +1,9 @@
+target/
+.build/
+.gradle/
+.gradle-cache/
+.git
+.gitignore
+.idea
+.vscode
+*.iml

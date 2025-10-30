@@ -2,6 +2,7 @@ package com.moviesp.builder.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,16 +10,48 @@ import java.util.List;
 @Configuration
 public class Constants {
 
-    @Value("${yandex.disk.legacy.user}")
-    public static String LEGACY_USER;
-    @Value("${yandex.disk.legacy.token}")
-    public static String LEGACY_TOKEN;
-    @Value("${yandex.disk.updates.user}")
-    public String UPDATES_USER;
-    @Value("${yandex.disk.updates.token}")
-    public String UPDATES_TOKEN;
-    public static final String DEFAULT_USER = LEGACY_USER;
-    public static final String DEFAULT_TOKEN = LEGACY_TOKEN;
+    private static String legacyUser;
+    private static String legacyToken;
+    
+    @Value("${yandex.disk.legacy.user:}")
+    public void setLegacyUser(String legacyUser) {
+        Constants.legacyUser = legacyUser;
+    }
+    
+    @Value("${yandex.disk.legacy.token:}")
+    public void setLegacyToken(String legacyToken) {
+        Constants.legacyToken = legacyToken;
+    }
+    
+    public static String getLegacyUser() {
+        return legacyUser;
+    }
+    
+    public static String getLegacyToken() {
+        return legacyToken;
+    }
+    
+    @Value("${yandex.disk.updates.user:}")
+    private String updatesUser;
+    
+    @Value("${yandex.disk.updates.token:}")
+    private String updatesToken;
+    
+    public String getUpdatesUser() {
+        return updatesUser;
+    }
+    
+    public String getUpdatesToken() {
+        return updatesToken;
+    }
+    
+    public static String getDefaultUser() {
+        return getLegacyUser();
+    }
+    
+    public static String getDefaultToken() {
+        return getLegacyToken();
+    }
     public static final List<String> QUALITIES = Arrays.asList(
             "HD", "FullHD", "4K", "8K", "CAM", "4k", "8k", "TS", "TC", "HDR", "UHD", "SCR", "DVDRip", "HDRip", "BDRip", "WEB-DL",
             "WEBRip", "HDTV", "PDTV", "SDTV", "DVD", "VHS", "TVRip", "R5", "HD-TS", "HD-TC", "HD-SCR", "HD-DVDRip", "HD-HDRip", "HD-BDRip",

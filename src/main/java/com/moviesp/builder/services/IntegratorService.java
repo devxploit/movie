@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import static com.moviesp.builder.config.Constants.*;
+import com.moviesp.builder.config.Constants;
 
 import java.util.*;
 
@@ -34,7 +34,7 @@ public class IntegratorService {
         ResourcesArgs resourcesArgs = resourceArgsUseCase.generate();
 
         try {
-            final var resourceUseCase = new ResourceUseCase(DEFAULT_USER, DEFAULT_TOKEN, resourcesArgs);
+            final var resourceUseCase = new ResourceUseCase(Constants.getDefaultUser(), Constants.getDefaultToken(), resourcesArgs);
             Resource resource = resourceUseCase.execute();
             List<Resource> resourceList =  resource.getResourceList().getItems();
 
@@ -69,16 +69,16 @@ public class IntegratorService {
                     allTvUrl.putAll(processedUrls);
 
                     // Update folder in both PostgreSQL and Cloudflare (dual write)
-                    databaseService.updateFolder(res.getName(), "imported", DEFAULT_USER);
-                    cloudflareWorkerApiClient.updateFolder(res.getName(), "imported", DEFAULT_USER).block();
+                    databaseService.updateFolder(res.getName(), "imported", Constants.getDefaultUser());
+                    cloudflareWorkerApiClient.updateFolder(res.getName(), "imported", Constants.getDefaultUser()).block();
 
                 }else if(res.getType().equals("dir") && (res.getName().toLowerCase().contains("pelicula") || res.getName().toLowerCase().contains("pelucula")) ){
 
                     Map<String, List<MovieItemUrl>> processedUrls = processMoviesResources(res);
                     allMoviesUrl.putAll(processedUrls);
                     // Update folder in both PostgreSQL and Cloudflare (dual write)
-                    databaseService.updateFolder(res.getName(), "imported", DEFAULT_USER);
-                    cloudflareWorkerApiClient.updateFolder(res.getName(), "imported", DEFAULT_USER).block();
+                    databaseService.updateFolder(res.getName(), "imported", Constants.getDefaultUser());
+                    cloudflareWorkerApiClient.updateFolder(res.getName(), "imported", Constants.getDefaultUser()).block();
                 } else {
                     log.info(" - Skipping non-directory resource: {}", res.getName());
                 }
@@ -174,7 +174,7 @@ public class IntegratorService {
         final var resourcesArgsUseCase = new ResourceArgsUseCase(resource.getPath().getPath());
         ResourcesArgs resourcesArgs = resourcesArgsUseCase.generate();
 
-        final var resourceUseCase = new ResourceUseCase(DEFAULT_USER, DEFAULT_TOKEN, resourcesArgs);
+        final var resourceUseCase = new ResourceUseCase(Constants.getDefaultUser(), Constants.getDefaultToken(), resourcesArgs);
         Resource resourceDir = resourceUseCase.execute();
 
         log.warn("Directory: {} ", resourceDir.getName());
@@ -208,7 +208,7 @@ public class IntegratorService {
         final var resourcesArgsUseCase = new ResourceArgsUseCase(resource.getPath().getPath());
         ResourcesArgs resourcesArgs = resourcesArgsUseCase.generate();
 
-        final var resourceUseCase = new ResourceUseCase(DEFAULT_USER, DEFAULT_TOKEN, resourcesArgs);
+        final var resourceUseCase = new ResourceUseCase(Constants.getDefaultUser(), Constants.getDefaultToken(), resourcesArgs);
         Resource resourceDir = resourceUseCase.execute();
 
         log.warn(" Series Directory: {} ", resourceDir.getName());
@@ -223,7 +223,7 @@ public class IntegratorService {
             final var tvShowResourcesArgsUseCase = new ResourceArgsUseCase(res.getPath().getPath());
             ResourcesArgs seasonResourcesArgs = tvShowResourcesArgsUseCase.generate();
 
-            final var tvShowResourceUseCase = new ResourceUseCase(DEFAULT_USER, DEFAULT_TOKEN, seasonResourcesArgs);
+            final var tvShowResourceUseCase = new ResourceUseCase(Constants.getDefaultUser(), Constants.getDefaultToken(), seasonResourcesArgs);
             Resource seasonResourceDir = tvShowResourceUseCase.execute();
 
             List<Resource> seasonResourceList =  seasonResourceDir.getResourceList().getItems();

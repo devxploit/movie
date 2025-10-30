@@ -15,6 +15,8 @@ public class TvShow {
     private String name;
     private List<String> aliases;
     private List<Season> seasons;
+    private String posterPath;
+    private Double userScore;
 
 
 }

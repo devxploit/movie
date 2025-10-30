@@ -19,9 +19,12 @@ import java.util.*;
 public class IntegratorService {
 
     private final CloudflareWorkerApiClient cloudflareWorkerApiClient;
+    private final DatabaseService databaseService;
 
-    public IntegratorService(CloudflareWorkerApiClient cloudflareWorkerApiClient) {
+    public IntegratorService(CloudflareWorkerApiClient cloudflareWorkerApiClient,
+                            DatabaseService databaseService) {
         this.cloudflareWorkerApiClient = cloudflareWorkerApiClient;
+        this.databaseService = databaseService;
     }
 
     public void firstData() {
@@ -42,8 +45,8 @@ public class IntegratorService {
 
             int batchDirProcess = 5;
 
-            FoldersResponse foldersResponse = cloudflareWorkerApiClient.getFolders().block();
-            List<Folder> folders = foldersResponse != null && foldersResponse.success() ? foldersResponse.results() : null;
+            // Get folders from PostgreSQL database
+            List<Folder> folders = databaseService.getFolders();
 
             Map<String, List<MovieItemUrl>> allMoviesUrl = new java.util.HashMap<>();
             Map<String, List<TvshowItemUrl>> allTvUrl = new java.util.HashMap<>();
@@ -65,12 +68,16 @@ public class IntegratorService {
                     Map<String, List<TvshowItemUrl>> processedUrls = processMainSeriesDir(res);
                     allTvUrl.putAll(processedUrls);
 
+                    // Update folder in both PostgreSQL and Cloudflare (dual write)
+                    databaseService.updateFolder(res.getName(), "imported", DEFAULT_USER);
                     cloudflareWorkerApiClient.updateFolder(res.getName(), "imported", DEFAULT_USER).block();
 
                 }else if(res.getType().equals("dir") && (res.getName().toLowerCase().contains("pelicula") || res.getName().toLowerCase().contains("pelucula")) ){
 
                     Map<String, List<MovieItemUrl>> processedUrls = processMoviesResources(res);
                     allMoviesUrl.putAll(processedUrls);
+                    // Update folder in both PostgreSQL and Cloudflare (dual write)
+                    databaseService.updateFolder(res.getName(), "imported", DEFAULT_USER);
                     cloudflareWorkerApiClient.updateFolder(res.getName(), "imported", DEFAULT_USER).block();
                 } else {
                     log.info(" - Skipping non-directory resource: {}", res.getName());
@@ -100,8 +107,13 @@ public class IntegratorService {
 
                 if (movieBatch.size() >= batchSize || entry.equals(allMoviesUrl.entrySet().stream().reduce((first, second) -> second).orElse(null))) {
                     try {
+                        // Save to PostgreSQL
+                        databaseService.saveMovies(movieBatch);
+                        
+                        // Save to Cloudflare (dual write)
                         cloudflareWorkerApiClient.createMovies(movieBatch).block();
-                        log.info("Batch of {} movies created successfully", movieBatch.size());
+                        
+                        log.info("Batch of {} movies created successfully in both PostgreSQL and Cloudflare", movieBatch.size());
                         movieBatch.clear();
                         Thread.sleep(1500);
                     } catch (WebClientResponseException e) {
@@ -126,8 +138,13 @@ public class IntegratorService {
 
                 if (tvShowBatch.size() >= batchSize || entry.equals(allTvUrl.entrySet().stream().reduce((first, second) -> second).orElse(null))) {
                     try {
+                        // Save to PostgreSQL
+                        databaseService.saveTvShows(tvShowBatch);
+                        
+                        // Save to Cloudflare (dual write)
                         cloudflareWorkerApiClient.createTvshows(tvShowBatch).block();
-                        log.info("Batch of {} TV show episodes created successfully", tvShowBatch.size());
+                        
+                        log.info("Batch of {} TV show episodes created successfully in both PostgreSQL and Cloudflare", tvShowBatch.size());
                         tvShowBatch.clear();
                         Thread.sleep(1500);
                     } catch (WebClientResponseException e) {

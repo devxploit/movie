@@ -16,7 +16,7 @@ public class Movie {
     private List<Genre> genres;
     private Double userScore;
     private List<String> aliases;
-
     private List<Video> videos;
+    private String posterPath;
 
 }

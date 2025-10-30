@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  app:
+    ports:
+      - "10000:8080"
+    environment:
+      - PORT=8080
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  # Make infra optional via profiles so `docker compose up app postgres redis` is simple
+  nginx:
+    profiles: ["nginx"]
+  certbot:
+    profiles: ["nginx"]
+  prometheus:
+    profiles: ["monitoring"]
+  grafana:
+    profiles: ["monitoring"]
+
+

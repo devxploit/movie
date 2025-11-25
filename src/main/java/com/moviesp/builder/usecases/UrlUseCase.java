@@ -1,5 +1,6 @@
 package com.moviesp.builder.usecases;
 
+import com.moviesp.builder.config.Constants;
 import com.moviesp.builder.dtos.MovieItemUrl;
 import com.moviesp.builder.dtos.TvshowItemUrl;
 import com.yandex.disk.rest.json.Resource;
@@ -16,14 +17,14 @@ public class UrlUseCase {
 
     public MovieItemUrl executeMovieUrl(){
 
-        final var publicUrlUseCase = new PublicUrlUseCase(DEFAULT_USER, DEFAULT_TOKEN, resource);
+        final var publicUrlUseCase = new PublicUrlUseCase(Constants.getDefaultUser(), Constants.getDefaultToken(), resource);
         String publicUrl = publicUrlUseCase.getPublicUrl();
         return processMoviePublicUrl(resource.getName(), publicUrl);
     }
 
     public TvshowItemUrl executeTvShowUrl(String name, String id){
 
-        final var publicUrlUseCase = new PublicUrlUseCase(DEFAULT_USER, DEFAULT_TOKEN, resource);
+        final var publicUrlUseCase = new PublicUrlUseCase(Constants.getDefaultUser(), Constants.getDefaultToken(), resource);
         String publicUrl = publicUrlUseCase.getPublicUrl();
         return processTvPublicUrl(resource.getName(), publicUrl, name, id);
     }

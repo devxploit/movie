@@ -133,6 +133,97 @@ docker compose exec nginx nginx -t
 ./scripts/init-ssl.sh
 ```
 
+## Ejecución local con Docker
+
+### Requisitos
+
+- Docker 24.x o superior y Docker Compose v2 (`docker compose version`)
+- Al menos 4 GB de RAM para contenedores (API + PostgreSQL + Redis)
+
+### 1. Preparar el entorno
+
+```bash
+git clone https://github.com/your-repo/movie.git
+cd movie
+```
+
+1. Crea un archivo `.env` (Compose lo lee automáticamente) con las variables mínimas:
+
+   ```bash
+   cat <<'EOF' > .env
+   DB_PASSWORD=superseguro
+   LEGACY_USER=
+   LEGACY_TOKEN=
+   UPDATES_USER=
+   UPDATES_TOKEN=
+   GRAFANA_PASSWORD=admin
+   EOF
+   ```
+
+   Ajusta los valores según tus credenciales. El resto de variables (`DATABASE_*`, `REDIS_*`, etc.) ya vienen definidas en `docker-compose.yml`.
+
+2. (Opcional) Construye el dashboard si quieres servirlo a través de Nginx:
+
+   ```bash
+   cd dashboard
+   npm install
+   npm run build
+   cd ..
+   ```
+
+   El resultado queda en `dashboard/build`, que Nginx montará cuando habilites ese servicio.
+
+### 2. Levantar los servicios básicos
+
+Para desarrollo basta con API + PostgreSQL + Redis. `docker-compose.override.yml` ya expone los puertos ideales (`http://localhost:10000` para la API y `localhost:5432` para PostgreSQL).
+
+```bash
+docker compose up -d postgres redis app
+```
+
+Compose construirá la imagen de Spring Boot usando el `Dockerfile`, aplicará las migraciones Flyway y expondrá el health check en `http://localhost:10000/actuator/health`.
+
+Verifica:
+
+```bash
+curl http://localhost:10000/actuator/health
+```
+
+### 3. Servicios opcionales mediante perfiles
+
+- **Nginx + Certbot** (simular proxy/SSL):  
+  `docker compose --profile nginx up -d nginx certbot`
+- **Prometheus + Grafana** (observabilidad):  
+  `docker compose --profile monitoring up -d prometheus grafana`
+
+Los perfiles mantienen liviano el entorno local porque solo inicias los contenedores necesarios.
+
+### 4. Comandos útiles en local
+
+```bash
+# Seguir logs de la API
+docker compose logs -f app
+
+# Reconstruir la imagen tras cambios en el código
+docker compose build app
+docker compose up -d app
+
+# Backup manual de la base
+./scripts/backup-db.sh
+```
+
+### 5. Apagar y limpiar
+
+```bash
+# Detener contenedores conservando volúmenes
+docker compose down
+
+# Detener y borrar volúmenes (datos de Postgres/Redis)
+docker compose down -v
+```
+
+Con estos pasos tendrás la plataforma funcionando localmente con Docker para pruebas y desarrollo.
+
 ## Costs
 
 - Hetzner CPX31: €11.90/month (~$13 USD)

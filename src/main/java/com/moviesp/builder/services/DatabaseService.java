@@ -5,6 +5,8 @@ import com.moviesp.builder.dtos.Movie;
 import com.moviesp.builder.dtos.TvShow;
 import com.moviesp.builder.entities.FolderEntity;
 import com.moviesp.builder.entities.GenreEntity;
+import com.moviesp.builder.entities.MovieEntity;
+import com.moviesp.builder.entities.TvShowEntity;
 import com.moviesp.builder.mappers.FolderMapper;
 import com.moviesp.builder.mappers.MovieMapper;
 import com.moviesp.builder.mappers.TvShowMapper;

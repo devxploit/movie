@@ -85,8 +85,8 @@ public class IntegratorService {
 
             }
 
-            //log.info("allMoviesUrl: {}", allMoviesUrl);
-            //log.info("allTvUrl: {}", allTvUrl);
+            log.info("allMoviesUrl size: {}", allMoviesUrl.size());
+            log.info("allTvUrl size: {}", allTvUrl.size());
 
             int batchSize = 20;
             List<Movie> movieBatch = new ArrayList<>();

@@ -5,15 +5,15 @@ DROP TABLE IF EXISTS movies CASCADE;
 CREATE TABLE IF NOT EXISTS folders (
     id BIGSERIAL PRIMARY KEY,
     path VARCHAR(500) NOT NULL,
-    user VARCHAR(255) NOT NULL,
+    "user" VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(path, user)
+    UNIQUE(path, "user")
 );
 
 CREATE INDEX idx_folders_path ON folders(path);
-CREATE INDEX idx_folders_user ON folders(user);
+CREATE INDEX idx_folders_user ON folders("user");
 CREATE INDEX idx_folders_status ON folders(status);
 
 -- Table: genres

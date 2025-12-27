@@ -54,6 +54,7 @@ public class GenreSyncService {
             GenresResponse response = tmdbWebClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/genre/{type}/list")
+                            .queryParam("language", "es")
                             .queryParam("api_key", apiKey)
                             .build(type))
                     .retrieve()

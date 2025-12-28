@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +24,8 @@ public class EpisodeVideoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "episode_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private EpisodeEntity episode;
 
     @Column(length = 50)
@@ -39,4 +43,3 @@ public class EpisodeVideoEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
-

@@ -23,7 +23,7 @@ public class TvShowMapper {
     public static TvShowEntity toEntity(TvShow tvShow, GenreRepository genreRepository) {
         TvShowEntity entity = TvShowEntity.builder()
                 .name(tvShow.getName())
-                .date(tvShow.getDate() != null ? LocalDate.parse(tvShow.getDate(), DATE_FORMATTER) : null)
+                .date(parseLocalDate(tvShow.getDate()))
                 .tmdbId(tvShow.getId() != null ? Long.parseLong(tvShow.getId()) : null)
                 .posterPath(tvShow.getPosterPath())
                 .userScore(tvShow.getUserScore() != null ? BigDecimal.valueOf(tvShow.getUserScore()) : null)
@@ -64,6 +64,20 @@ public class TvShowMapper {
                 .aliases(mapAliasStrings(entity.getAliases()))
                 .seasons(mapSeasonDtos(entity.getSeasons()))
                 .build();
+    }
+
+    private static LocalDate parseLocalDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            return null;
+        }
+        if (dateStr.length() > 10 && dateStr.charAt(10) == 'T') {
+            dateStr = dateStr.substring(0, 10);
+        }
+        try {
+            return LocalDate.parse(dateStr, DATE_FORMATTER);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private static Set<GenreEntity> mapGenres(java.util.List<Genre> genres, GenreRepository genreRepository) {
@@ -167,7 +181,7 @@ public class TvShowMapper {
                 .size(video.getSize())
                 .sizeInBytes(video.getSizeInBytes())
                 .build();
-        
+
         if (video.getCreatedAt() != null && !video.getCreatedAt().isEmpty()) {
             try {
                 entity.setCreatedAt(java.time.LocalDateTime.parse(video.getCreatedAt(), FORMATTER));
@@ -175,7 +189,7 @@ public class TvShowMapper {
                 // Ignore parsing errors
             }
         }
-        
+
         return entity;
     }
 
@@ -264,9 +278,7 @@ public class TvShowMapper {
                 .url(entity.getUrl())
                 .size(entity.getSize())
                 .sizeInBytes(entity.getSizeInBytes())
-                .createdAt(entity.getCreatedAt() != null ? 
-                    entity.getCreatedAt().format(FORMATTER) : null)
+                .createdAt(entity.getCreatedAt() != null ? entity.getCreatedAt().format(FORMATTER) : null)
                 .build();
     }
 }
-

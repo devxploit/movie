@@ -8,9 +8,11 @@ import java.util.Optional;
 
 @Repository
 public interface MovieRepository extends JpaRepository<MovieEntity, Long> {
-    
-    Optional<MovieEntity> findByTmdbId(Long tmdbId);
-    
-    boolean existsByTmdbId(Long tmdbId);
-}
 
+    Optional<MovieEntity> findByTmdbId(Long tmdbId);
+
+    boolean existsByTmdbId(Long tmdbId);
+
+    org.springframework.data.domain.Page<MovieEntity> findByNameContainingIgnoreCase(String name,
+            org.springframework.data.domain.Pageable pageable);
+}

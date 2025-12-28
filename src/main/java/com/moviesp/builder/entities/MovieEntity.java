@@ -1,10 +1,7 @@
 package com.moviesp.builder.entities;
 
+import lombok.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,17 +42,19 @@ public class MovieEntity {
     private LocalDateTime updatedAt;
 
     @ManyToMany
-    @JoinTable(
-        name = "movie_genres",
-        joinColumns = @JoinColumn(name = "movie_id"),
-        inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
+    @JoinTable(name = "movie_genres", joinColumns = @JoinColumn(name = "movie_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<GenreEntity> genres;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<MovieAliasEntity> aliases;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<MovieVideoEntity> videos;
 
     @PrePersist
@@ -69,4 +68,3 @@ public class MovieEntity {
         updatedAt = LocalDateTime.now();
     }
 }
-

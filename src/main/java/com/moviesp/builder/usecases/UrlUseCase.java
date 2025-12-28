@@ -71,7 +71,7 @@ public class UrlUseCase {
             log.error("The file name does not contain an 'id_' segment: {}", name);
             return null;
         }
-        String id = idSplit[1].replace("."+nameFormat, "").replace("."+nameFormat.toUpperCase(),"").trim();
+        String id = idSplit[1].replace("."+nameFormat, "").replace("."+nameFormat.toUpperCase(),"").replace("_", "").trim();
         log.debug("Extracted movie ID: {}", id);
 
         //Obtener calidad

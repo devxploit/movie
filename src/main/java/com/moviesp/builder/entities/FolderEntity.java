@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "folders", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"path", "user"})
+        @UniqueConstraint(columnNames = { "path", "user" })
 })
 @Data
 @Builder
@@ -25,7 +25,7 @@ public class FolderEntity {
     @Column(nullable = false, length = 500)
     private String path;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "\"user\"", nullable = false, length = 255)
     private String user;
 
     @Column(nullable = false, length = 50)
@@ -48,4 +48,3 @@ public class FolderEntity {
         updatedAt = LocalDateTime.now();
     }
 }
-

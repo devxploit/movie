@@ -18,7 +18,7 @@ public class AppController {
 
     @GetMapping("/firstData")
     public String testInfo() {
-        integratorService.firstData();
+        integratorService.firstData("legacy");
         return "Info charged";
     }
 

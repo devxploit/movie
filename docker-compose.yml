@@ -37,12 +37,14 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: moviesp-api
+    ports:
+      - "8080:8080"
     environment:
       - PORT=8080
       - JAVA_OPTS=-Xms512m -Xmx1536m
       - DATABASE_URL=jdbc:postgresql://postgres:5432/moviedb
       - DATABASE_USER=movieuser
-      - DATABASE_PASSWORD=${DB_PASSWORD}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-superseguro}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - LEGACY_USER=${LEGACY_USER}
@@ -58,11 +60,27 @@ services:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: moviesp-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api/dashboard
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - app
 
   # PostgreSQL Database
   postgres:
@@ -71,7 +89,7 @@ services:
     environment:
       - POSTGRES_DB=moviedb
       - POSTGRES_USER=movieuser
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-superseguro}
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -80,19 +98,12 @@ services:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U movieuser -d moviedb"]
+      test: [ "CMD-SHELL", "pg_isready -U movieuser -d moviedb" ]
       interval: 10s
       timeout: 5s
       retries: 5
     command: >
-      postgres
-      -c max_connections=100
-      -c shared_buffers=256MB
-      -c effective_cache_size=1GB
-      -c maintenance_work_mem=128MB
-      -c checkpoint_completion_target=0.9
-      -c wal_buffers=16MB
-      -c default_statistics_target=100
+      postgres -c max_connections=100 -c shared_buffers=256MB -c effective_cache_size=1GB -c maintenance_work_mem=128MB -c checkpoint_completion_target=0.9 -c wal_buffers=16MB -c default_statistics_target=100
 
   # Redis Cache
   redis:
@@ -105,7 +116,7 @@ services:
       - app-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 3
@@ -131,7 +142,7 @@ services:
     container_name: grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
       - GF_SERVER_ROOT_URL=https://monitoring.yourdomain.com
       - GF_INSTALL_PLUGINS=redis-datasource
     volumes:
@@ -152,4 +163,5 @@ volumes:
   redis_data:
   prometheus_data:
   grafana_data:
+
 

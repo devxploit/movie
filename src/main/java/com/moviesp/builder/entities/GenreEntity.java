@@ -1,16 +1,13 @@
 package com.moviesp.builder.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
 @Entity
 @Table(name = "genres", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"id", "type"})
+        @UniqueConstraint(columnNames = { "id", "type" })
 })
 @Data
 @Builder
@@ -28,9 +25,12 @@ public class GenreEntity {
     private String type;
 
     @ManyToMany(mappedBy = "genres")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<MovieEntity> movies;
 
     @ManyToMany(mappedBy = "genres")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<TvShowEntity> tvShows;
 }
-

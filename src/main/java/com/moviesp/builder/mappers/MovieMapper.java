@@ -22,7 +22,7 @@ public class MovieMapper {
         MovieEntity entity = MovieEntity.builder()
                 .name(movie.getTitle())
                 .date(movie.getDate() != null ? LocalDate.parse(movie.getDate(), DATE_FORMATTER) : null)
-                .tmdbId(movie.getId() != null ? Long.parseLong(movie.getId()) : null)
+                .tmdbId(movie.getId() != null && !movie.getId().isEmpty() ? Long.parseLong(movie.getId()) : null)
                 .posterPath(movie.getPosterPath())
                 .userScore(movie.getUserScore() != null ? BigDecimal.valueOf(movie.getUserScore()) : null)
                 .genres(mapGenres(movie.getGenres(), genreRepository))

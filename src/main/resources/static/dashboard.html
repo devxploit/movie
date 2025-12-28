@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies & Series Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <h1>Admin Dashboard</h1>
+    </header>
+
+    <div class="container">
+
+        <!-- Controls -->
+        <div class="controls-bar">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('movies')">Movies</button>
+                <button class="tab-btn" onclick="switchTab('tvshows')">TV Shows</button>
+                <button class="tab-btn" onclick="switchTab('genres')">Genres</button>
+                <button class="tab-btn" onclick="switchTab('users')">Users</button>
+                <button class="tab-btn" onclick="switchTab('sync')">Synchronization</button>
+            </div>
+
+            <input type="text" id="search-input" class="search-input" placeholder="Search..."
+                onfocus="if(state.currentTab === 'sync') this.blur();">
+        </div>
+
+        <!-- Movies Section -->
+        <div id="movies-section" class="section active">
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>TMDB ID</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="movies-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div id="movies-pagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Series Section -->
+        <div id="series-section" class="section">
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>TMDB ID</th>
+                            <th>Score</th>
+                            <th>First Air Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="series-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div id="series-pagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Genres Section -->
+        <div id="genres-section" class="section">
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="genres-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div id="genres-pagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users-section" class="section">
+            <div class="controls-bar" style="margin-bottom: 1rem;">
+                <button class="btn btn-success" onclick="openUserModal()">+ Add User</button>
+            </div>
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+                <div id="users-pagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <!-- Sync Section -->
+        <div id="sync-section" class="section">
+            <div
+                style="background: var(--card-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border);">
+                <h2 style="margin-bottom: 1rem;">Synchronization Tools</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Trigger manual synchronization processes.
+                </p>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button id="sync-btn" class="btn btn-primary" onclick="triggerSync()">Run First Data Sync</button>
+                    <button id="update-urls-btn" class="btn btn-success" onclick="triggerUpdateUrls()">Update New
+                        URLs</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Edit Modal (Movies/TvShows) -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Item</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="edit-name">
+                </div>
+
+                <div class="form-group">
+                    <label>TMDB ID</label>
+                    <input type="number" id="edit-tmdbId">
+                </div>
+
+                <div class="form-group">
+                    <label>Poster Path</label>
+                    <input type="text" id="edit-posterPath">
+                </div>
+
+                <div class="form-group">
+                    <label>User Score</label>
+                    <input type="number" step="0.1" id="edit-userScore">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:var(--border); color:white;"
+                    onclick="closeModal()">Cancel</button>
+                <button class="btn btn-success" onclick="saveChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="user-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="user-modal-title">Add/Edit User</h3>
+                <button class="close-btn" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="user-id">
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="user-email">
+                </div>
+
+                <div class="form-group">
+                    <label>Password (Leave blank to keep current)</label>
+                    <input type="password" id="user-password">
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="user-role"
+                        style="width:100%; padding:0.8rem; background:var(--bg-color); border:1px solid var(--border); border-radius:6px; color:var(--text-primary);">
+                        <option value="USER">USER</option>
+                        <option value="ADMIN">ADMIN</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Subscription Status</label>
+                    <select id="user-status"
+                        style="width:100%; padding:0.8rem; background:var(--bg-color); border:1px solid var(--border); border-radius:6px; color:var(--text-primary);">
+                        <option value="INACTIVE">INACTIVE</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="EXPIRED">EXPIRED</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background:var(--border); color:white;"
+                    onclick="closeUserModal()">Cancel</button>
+                <button class="btn btn-success" onclick="saveUser()">Save User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

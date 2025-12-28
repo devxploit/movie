@@ -1,10 +1,9 @@
 package com.moviesp.builder.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +21,9 @@ public class MovieVideoEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
     private MovieEntity movie;
 
     @Column(length = 50)
@@ -39,4 +41,3 @@ public class MovieVideoEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
-

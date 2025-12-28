@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,17 +47,17 @@ public class TvShowEntity {
     private LocalDateTime updatedAt;
 
     @ManyToMany
-    @JoinTable(
-        name = "tvshow_genres",
-        joinColumns = @JoinColumn(name = "tvshow_id"),
-        inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
+    @JoinTable(name = "tvshow_genres", joinColumns = @JoinColumn(name = "tvshow_id"), inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private Set<GenreEntity> genres;
 
     @OneToMany(mappedBy = "tvShow", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<TvShowAliasEntity> aliases;
 
     @OneToMany(mappedBy = "tvShow", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<SeasonEntity> seasons;
 
     @PrePersist
@@ -69,4 +71,3 @@ public class TvShowEntity {
         updatedAt = LocalDateTime.now();
     }
 }
-

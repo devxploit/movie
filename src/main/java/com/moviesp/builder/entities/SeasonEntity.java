@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +29,9 @@ public class SeasonEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tvshow_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private TvShowEntity tvShow;
 
     @Column(nullable = false, length = 255)
@@ -43,6 +50,7 @@ public class SeasonEntity {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "season", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<EpisodeEntity> episodes;
 }
-

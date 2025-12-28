@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +28,7 @@ public class EpisodeVideoEntity {
     @JoinColumn(name = "episode_id", nullable = false)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private EpisodeEntity episode;
 
     @Column(length = 50)

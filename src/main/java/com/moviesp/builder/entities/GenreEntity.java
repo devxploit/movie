@@ -2,6 +2,7 @@ package com.moviesp.builder.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Set;
 
@@ -27,10 +28,12 @@ public class GenreEntity {
     @ManyToMany(mappedBy = "genres")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     private Set<MovieEntity> movies;
 
     @ManyToMany(mappedBy = "genres")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     private Set<TvShowEntity> tvShows;
 }

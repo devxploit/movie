@@ -12,24 +12,26 @@ export default function TvShowsPage() {
     const [data, setData] = useState<TvShow[]>([])
     const [pageIndex, setPageIndex] = useState(0)
     const [pageSize, setPageSize] = useState(20)
-    const [pageCount, setPageCount] = useState(0)
+    const [pageCount, setPageCount] = useState<number | undefined>(undefined)
     const [totalItems, setTotalItems] = useState(0)
     const [loading, setLoading] = useState(true)
     const [modalOpen, setModalOpen] = useState(false)
     const [editingTvShow, setEditingTvShow] = useState<TvShow | null>(null)
+    const [search, setSearch] = useState("")
 
     const fetchTvShows = async () => {
         setLoading(true)
         try {
             const token = localStorage.getItem('authToken')
-            const res = await fetch(`${API_URL}/tvshows?page=${pageIndex}&size=${pageSize}`, {
+            const searchParam = search ? `&search=${search}` : ''
+            const res = await fetch(`${API_URL}/tvshows?page=${pageIndex}&size=${pageSize}${searchParam}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
             if (res.ok) {
                 const json = await res.json()
-                setData(json.content)
-                setPageCount(json.totalPages)
-                setTotalItems(json.totalElements)
+                setData(json.content || [])
+                setPageCount(json.totalPages || 0)
+                setTotalItems(json.totalElements || 0)
             }
         } catch (err) {
             console.error(err)
@@ -37,6 +39,16 @@ export default function TvShowsPage() {
             setLoading(false)
         }
     }
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setPageIndex(0) // Reset to first page on search
+            fetchTvShows()
+        }, 500)
+
+        return () => clearTimeout(timer)
+    }, [search])
 
     useEffect(() => {
         fetchTvShows()
@@ -121,6 +133,8 @@ export default function TvShowsPage() {
                             setPageSize(updater.pageSize)
                         }
                     }}
+                    searchValue={search}
+                    onSearchChange={setSearch}
                 />
             )}
 
